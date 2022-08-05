@@ -66,7 +66,7 @@ def embed(**kwargs):
 
 def getCategory(module):
     try:
-        category = re.search(r"cogs\.(\w+)\.",module).groups()[0]
+        category = re.search(r"commands\.(\w+)\.",module).groups()[0]
     except AttributeError:
         category = "Misc"
     return category
