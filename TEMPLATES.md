@@ -1,3 +1,27 @@
+## Project Structure
+
+After moving boilerBOT's code to somewhere on your python path, you need to set up your bot's environment. The things you'll need are:
+* A main .py file for you propject (Often bot.py)
+* A config.yaml in the same folder, using the structure found in config-example.yaml. You'll need to create a bot and provide the login token in this file, see [the discord developer page](https://discord.com/developers/applications)
+* A subfolder called `commands`, where you will store the command logic for your bot. Optionally, you can create categorised subfolders in here for your commands.
+
+A typical project folder will look something like this:
+```
+examplebot/
+├─ commands/
+│  ├─ fun/
+│  │  ├─ telljoke.py
+│  ├─ utility/
+│  │  ├─ telltime.py
+│  │  ├─ colourrole.py
+│  ├─ moderation/
+│  │  ├─ muteuser.py
+│  │  ├─ banuser.py
+├─ bot.py
+├─ config.yaml
+
+```
+
 ## Main bot.py
 The bare minimum to initialise boilerBOT is this:
 ```python
@@ -7,7 +31,7 @@ botClient = bb.bot(bb.lib.cfg['options']['prefix'], intents=bb.intents)
 bb.atexit.register(botClient.shutdown)
 botClient.run(bb.lib.cfg['discord']['token'])
 ```
-If you need to modify any of the core behaviour of the bot.py, you can inherit it like so and override its' core funcitons:
+If you need to modify any of the core behaviour of the bot.py, you can inherit it like so and override its' core funcitons: ~~but at this point, why not write the whole thing from scratch?~~
 ```python
 import boilerBot as bb
 
@@ -55,4 +79,39 @@ class COMMAND_NAME(commands.Cog):
     
 def setup(bot):
     bot.add_cog(COMMAND_NAME(bot))
+```
+As an example, here is the built-in about command:
+```python
+## Initialisation
+import boilerBot.lib as lib
+import discord
+
+from discord.ext import commands, tasks
+
+## Define about cog
+class about(commands.Cog):
+    ## Initialise with help info
+    def __init__(self,bot):
+        self.bot = bot
+        self.category = lib.getCategory(self.__module__)
+        self.description = f"Display information about {self.bot.user.name}"
+        self.usage = f"""
+        {self.bot.command_prefix}about
+        """
+        self.forbidden = False
+        
+    ## Callable command to provide info about bot
+    @commands.command()
+    async def about(self, ctx, *command):
+        embed=lib.embed(
+            title=lib.cfg['about']['title'],
+            description=lib.cfg['about']['desc'],
+            url=lib.cfg['about']['url'],
+            thumbnail=True
+        )
+        await ctx.send(embed=embed)
+    
+def setup(bot):
+    bot.add_cog(about(bot))
+
 ```
