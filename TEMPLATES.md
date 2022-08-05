@@ -3,22 +3,26 @@
 After moving boilerBOT's code to somewhere on your python path, you need to set up your bot's environment. The things you'll need are:
 * A main .py file for you propject (Often bot.py)
 * A config.yaml in the same folder, using the structure found in config-example.yaml. You'll need to create a bot and provide the login token in this file, see [the discord developer page](https://discord.com/developers/applications)
-* A subfolder called `commands`, where you will store the command logic for your bot. Optionally, you can create categorised subfolders in here for your commands.
+* A subfolder called `commands/`, where you will store the command logic for your bot. Optionally, you can create categorised subfolders in here for your commands.
+* *OPTIONAL*: A subfolder called `common/`, where you can store code you intend to re-use in multiple places. By writing an `__init__.py`, you can make these easier to import. 
 
 A typical project folder will look something like this:
 ```
 examplebot/
 ├─ commands/
 │  ├─ fun/
-│  │  ├─ telljoke.py
+│  │  └─ telljoke.py
 │  ├─ utility/
 │  │  ├─ telltime.py
-│  │  ├─ colourrole.py
+│  │  └─ colourrole.py
 │  ├─ moderation/
 │  │  ├─ muteuser.py
-│  │  ├─ banuser.py
+│  │  └─ banuser.py
+├─ common/
+│  ├─ __init__.py
+│  └─ utilityfunc.py
 ├─ bot.py
-├─ config.yaml
+└─ config.yaml
 
 ```
 
@@ -115,3 +119,15 @@ def setup(bot):
     bot.add_cog(about(bot))
 
 ```
+
+## Common
+Common code can be stored seperate to commands and, with the use of an `__init__.py`, easilly imported to other files in the project. 
+The simplest `__init__.py` consists of:
+```python
+from . import *
+```
+Which allows you to pull in classes, functions and variables from files in `common/` anywhere else in your project like so:
+```python
+from common import utilityFunc, TemplateClass #etc
+```
+This can greatly improve consistence accross your project and reduce re-writing of code, and is essentially how boilerBOT started.
