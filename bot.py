@@ -44,7 +44,10 @@ class bot(commands.Bot):
                 self.guildVars = json.load(file)
         except FileNotFoundError:
             self.guildVars = {}
-
+        try:
+            self.guildVarTemplate = kwargs["defaultGuildVars"] 
+        except KeyError:
+            self.guildVarTemplate = {}
 
     ## Post login activity
     async def on_ready(self):
@@ -60,7 +63,7 @@ class bot(commands.Bot):
 
     ## Setup guildVars for new guild
     async def on_guild_join(self, guild):
-        self.guildVars[str(guild.id)] = {}
+        self.guildVars[str(guild.id)] = self.guildVarTemplate
     
     ## Dump guildVars on guild remove
     async def on_guild_remove(self,guild):

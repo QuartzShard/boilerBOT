@@ -35,6 +35,14 @@ botClient = bb.bot(bb.lib.cfg['options']['prefix'], intents=bb.intents)
 bb.atexit.register(botClient.shutdown)
 botClient.run(bb.lib.cfg['discord']['token'])
 ```
+If you need to store per-server information with your bot, you should specify the default state of `guildVars` when you initialise. This is a guild-id keyed `dict` that will hold your variables.
+```python
+import boilerBot as bb # or whatever name you prefer
+
+botClient = bb.bot(bb.lib.cfg['options']['prefix'], defaultGuildVars={'var1':False,'var2':[],'var3':None}, intents=bb.intents)
+bb.atexit.register(botClient.shutdown)
+botClient.run(bb.lib.cfg['discord']['token'])
+```
 If you need to modify any of the core behaviour of the bot.py, you can inherit it like so and override its' core funcitons: ~~but at this point, why not write the whole thing from scratch?~~
 ```python
 import boilerBot as bb
