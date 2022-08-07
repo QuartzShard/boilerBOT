@@ -24,6 +24,8 @@ options:
   prefix: "!" 
   #Message embed settings
   embed:
+    #Delete last message when new one sent?
+    cleanup: True
     colour:
       #RGB values for colour presets
       default:
