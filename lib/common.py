@@ -30,7 +30,7 @@ def embed(**kwargs):
     body - list of entries to be seperated by a <hr>, follows sections
     colour - discord.Colour object to ovveride default
     url - webpage to link to
-    thumbnail - boolean to display roleman thumbnail
+    thumbnail - boolean to display default thumbnail, or a url to a specific thumbnail
     footer - Text to put at the bottom of the embed
     """
     
@@ -58,8 +58,10 @@ def embed(**kwargs):
     if ("url" in kwargs.keys()):
         embed.url = kwargs["url"]
     if ("thumbnail" in kwargs.keys()):
-        if kwargs["thumbnail"]:
+        if kwargs["thumbnail"] and not type(kwargs['thumbnail']) == str:
             embed.set_image(url=cfg['options']['embed']['thumbnail'])
+        elif type(kwargs['thumbnail']) == str:
+            embed.set_image(url=kwargs['thumbnail'])
     if ("footer" in kwargs.keys()):
         embed.set_footer(text=kwargs["footer"])
     return embed
