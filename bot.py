@@ -39,10 +39,13 @@ class bot(commands.Bot):
                         self.load_extension(f"{parent}.{name}")
         
         ## Load per-guild variables
-        try:
-            with open("guildVars.json","r") as file:
-                self.guildVars = json.load(file)
-        except FileNotFoundError:
+        if lib.cfg['options']['persist']:
+            try:
+                with open("guildVars.json","r") as file:
+                    self.guildVars = json.load(file)
+            except FileNotFoundError:
+                self.guildVars = {}
+        else:
             self.guildVars = {}
         try:
             self.guildVarTemplate = kwargs["defaultGuildVars"] 
@@ -80,8 +83,9 @@ class bot(commands.Bot):
 
     ## Store current state of guildVars in a json on shutdown to persist over restarts
     def shutdown(self):
-        with open("guildVars.json","w+") as file:
-            json.dump(self.guildVars,file)
+        if lib.cfg['options']['persist']:
+            with open("guildVars.json","w+") as file:
+                json.dump(self.guildVars,file)
 
 #Testing, will not run when imported
 if __name__ == "__main__":
