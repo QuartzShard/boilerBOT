@@ -14,7 +14,7 @@ class about(commands.Cog):
         self.usage = f"""
         {self.bot.command_prefix}about
         """
-        self.forbidden = False
+        self.hidden = False
         
     ## Callable command to provide info about bot
     @commands.command()

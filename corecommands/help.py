@@ -15,7 +15,7 @@ class help(commands.Cog):
         {self.bot.command_prefix}help
         {self.bot.command_prefix}help <command>
         """
-        self.forbidden = False
+        self.hidden = False
         
     ## Callable command to provide user help with command usage
     @commands.command(aliases=["?"])
@@ -29,7 +29,7 @@ class help(commands.Cog):
             if not (cog):
                 pass
             ## Gather usage info about command
-            elif (not cog.forbidden):
+            elif (not cog.hidden):
                 embed=lib.embed(
                     title=cog.qualified_name,
                     description=cog.description,
@@ -41,7 +41,7 @@ class help(commands.Cog):
             cogs = {}
             for cog in self.bot.cogs:
                 cog = self.bot.get_cog(cog)
-                if (not cog.forbidden):
+                if (not cog.hidden):
                     if not (cog.category in cogs.keys()):
                         cogs[cog.category] = []
                     cogs[cog.category].append(f"`{cog.qualified_name}`\n> {cog.description}")

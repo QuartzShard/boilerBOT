@@ -83,7 +83,7 @@ class COMMAND_NAME(commands.Cog):
         self.usage = f"""
         {self.bot.command_prefix}COMMAND NAME + USAGE INSTRUCTIONS
         """
-        self.forbidden = False
+        self.hidden = False
         
     @commands.command()
     async def COMMAND_NAME(self, ctx, *command):
@@ -110,7 +110,7 @@ class about(commands.Cog):
         self.usage = f"""
         {self.bot.command_prefix}about
         """
-        self.forbidden = False
+        self.hidden = False
         
     ## Callable command to provide info about bot
     @commands.command()
