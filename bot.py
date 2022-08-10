@@ -58,6 +58,8 @@ class bot(commands.Bot):
         ## Load commands that require login to init
         self.load_extension("boilerBot.corecommands.help")
         self.load_extension("boilerBot.corecommands.about")
+        if lib.cfg['options']['slashcommands']:
+            await self.sync_application_commands()
         ## Log ready
         lib.log('--------------------------------')
         lib.log('Bot Ready.')

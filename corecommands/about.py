@@ -12,13 +12,27 @@ class about(commands.Cog):
         self.category = lib.getCategory(self.__module__)
         self.description = f"Display information about {self.bot.user.name}"
         self.usage = f"""
-        {self.bot.command_prefix}about
+        {lib.cfg['options']['prefix']}about
         """
         self.hidden = False
         
     ## Callable command to provide info about bot
-    @commands.command()
-    async def about(self, ctx, *command):
+    @commands.command(name="about")
+    async def prefabout(self,ctx):
+        return await self.about(ctx)
+
+    @nextcord.slash_command(name="about")
+    async def slashabout(self,ctx):
+        """See information about this bot.
+
+        Parameters
+         ----------
+        ctx: Interaction
+            The interaction object
+        """
+        return await self.about(ctx)
+
+    async def about(self, ctx):
         embed=lib.embed(
             title=lib.cfg['about']['title'],
             description=lib.cfg['about']['desc'],

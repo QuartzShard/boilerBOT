@@ -1,7 +1,7 @@
 ## Initialisation
 import boilerBot.lib as lib
 import nextcord
-
+from typing import Optional
 from nextcord.ext import commands, tasks
 
 ## Define help cog
@@ -12,20 +12,38 @@ class help(commands.Cog):
         self.category = lib.getCategory(self.__module__)
         self.description = f"Display help about {self.bot.user.name}'s commands"
         self.usage = f"""
-        {self.bot.command_prefix}help
-        {self.bot.command_prefix}help <command>
+        {lib.cfg['options']['prefix']}help
+        {lib.cfg['options']['prefix']}help <command>
         """
         self.hidden = False
         
     ## Callable command to provide user help with command usage
-    @commands.command(aliases=["?"])
-    async def help(self, ctx, *args):
+    @commands.command(aliases=["?"],name="help")
+    async def prefhelp(self,ctx,*args):
+        if not args:
+            args = [None]
+        return await self.help(ctx,args[0])
+
+    @nextcord.slash_command(name="help")
+    async def slashhelp(self,ctx,command:Optional[str]):
+        """Get help on how to use this bot.
+
+        Parameters
+         ----------
+        ctx: Interaction
+            The interaction object
+        command: str
+            Optional: Specify a command for more detailled usage info
+        """
+        return await self.help(ctx,command)
+
+    async def help(self, ctx, arg):
         embed=False
-        prefix = self.bot.command_prefix
+        prefix = lib.cfg['options']['prefix']
         ## Provide specific help, or general command list
-        if (args) :
-            cog = self.bot.get_cog(args[0])
-            command = self.bot.get_command(args[0])
+        if (arg) :
+            cog = self.bot.get_cog(arg)
+            command = self.bot.get_command(arg)
             if not (cog):
                 pass
             ## Gather usage info about command
@@ -48,7 +66,7 @@ class help(commands.Cog):
             ## Display list of commands and descriptions
             embed=lib.embed(
                 title="List of commands:",
-                footer=f"Use {self.bot.command_prefix}help <command> to get more specific usage information."
+                footer=f"Use {prefix}help <command> to get more specific usage information."
             )
             for category in cogs.keys():
                 embed.add_field(name=category,value="\n".join(cogs[category]))
@@ -56,7 +74,7 @@ class help(commands.Cog):
         if not (embed):   
             embed=lib.embed(
                 title="This command does not exist",
-                description=f"Try {self.bot.command_prefix}help to see a list of available commands."
+                description=f"Try {prefix}help to see a list of available commands."
             )       
         await ctx.send(embed=embed)
 

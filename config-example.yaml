@@ -23,6 +23,8 @@ about:
 options:
   #Bot Command Prefix 
   prefix: "!" 
+  #Should core commands be registered as slash commands?
+  slashcommands: True
   #Store data in a json over restarts?
   persist: False
   #Message embed settings
