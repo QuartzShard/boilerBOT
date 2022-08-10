@@ -69,9 +69,9 @@ Structure the files like so:
 ```python
 ## Initialisation
 import boilerBot.lib as lib
-import discord
+import nextcord
 
-from discord.ext import commands, tasks
+from nextcord.ext import commands, tasks
 
 ## Define command cog
 class COMMAND_NAME(commands.Cog):
@@ -96,9 +96,9 @@ As an example, here is the built-in about command:
 ```python
 ## Initialisation
 import boilerBot.lib as lib
-import discord
+import nextcord
 
-from discord.ext import commands, tasks
+from nextcord.ext import commands, tasks
 
 ## Define about cog
 class about(commands.Cog):

@@ -2,7 +2,7 @@
 import datetime
 import re
 import yaml
-from discord import Embed, Color, Colour
+from nextcord import Embed, Color, Colour
 
 ## Exported values
 with open("config.yaml", "r") as ymlfile:
@@ -28,7 +28,7 @@ def embed(**kwargs):
     description - Text in embed, pre body
     sections - list of (title,content) tuples
     body - list of entries to be seperated by a <hr>, follows sections
-    colour - discord.Colour object to ovveride default
+    colour - nextcord.Colour object to ovveride default
     url - webpage to link to
     thumbnail - boolean to display default thumbnail, or a url to a specific thumbnail
     footer - Text to put at the bottom of the embed

@@ -1,6 +1,6 @@
 ## Initialisation
-import discord
-from discord.ext import commands, tasks
+import nextcord
+from nextcord.ext import commands, tasks
 
 ## Cog utility commands
 class cogUtils(commands.Cog):

@@ -1,8 +1,8 @@
 ## Initialisation
 import boilerBot.lib as lib
-import discord
+import nextcord
 
-from discord.ext import commands, tasks
+from nextcord.ext import commands, tasks
 
 ## Define about cog
 class about(commands.Cog):

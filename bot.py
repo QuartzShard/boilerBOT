@@ -3,19 +3,20 @@ import os
 import re
 import json
 import atexit
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from . import lib
 from . import corecommands
 ## Constants and Config
-intents = discord.Intents.default()
+intents = nextcord.Intents.default()
 intents.members = lib.cfg['discord']['intents']['members']
 intents.guilds = lib.cfg['discord']['intents']['guilds']
 intents.reactions = lib.cfg['discord']['intents']['reactions']
+intents.message_content = lib.cfg['discord']['intents']['message_content']
 
 ## Define bot class
 class bot(commands.Bot):
-    def __init__(self, *args, **kwargs):
+    def __init__(self,  *args, defaultGuildVars={}, **kwargs):
         super().__init__(*args,**kwargs)
 
         ## Remove default help command to replace with custom one
@@ -48,7 +49,7 @@ class bot(commands.Bot):
         else:
             self.guildVars = {}
         try:
-            self.guildVarTemplate = kwargs["defaultGuildVars"] 
+            self.guildVarTemplate = defaultGuildVars 
         except KeyError:
             self.guildVarTemplate = {}
 
