@@ -17,8 +17,9 @@ intents.message_content = lib.cfg['discord']['intents']['message_content']
 ## Define bot class
 class bot(commands.Bot):
     def __init__(self,  *args, defaultGuildVars={}, **kwargs):
+        if not args[0]:
+            args = ("/",)
         super().__init__(*args,**kwargs)
-
         ## Remove default help command to replace with custom one
         self.remove_command('help')
 

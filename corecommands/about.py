@@ -12,7 +12,7 @@ class about(commands.Cog):
         self.category = lib.getCategory(self.__module__)
         self.description = f"Display information about {self.bot.user.name}"
         self.usage = f"""
-        {lib.cfg['options']['prefix']}about
+        {self.bot.command_prefix}about
         """
         self.hidden = False
         

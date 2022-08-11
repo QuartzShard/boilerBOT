@@ -12,8 +12,8 @@ class help(commands.Cog):
         self.category = lib.getCategory(self.__module__)
         self.description = f"Display help about {self.bot.user.name}'s commands"
         self.usage = f"""
-        {lib.cfg['options']['prefix']}help
-        {lib.cfg['options']['prefix']}help <command>
+        {self.bot.command_prefix}help
+        {self.bot.command_prefix}help <command>
         """
         self.hidden = False
         
@@ -39,7 +39,6 @@ class help(commands.Cog):
 
     async def help(self, ctx, arg):
         embed=False
-        prefix = lib.cfg['options']['prefix']
         ## Provide specific help, or general command list
         if (arg) :
             cog = self.bot.get_cog(arg)
@@ -66,7 +65,7 @@ class help(commands.Cog):
             ## Display list of commands and descriptions
             embed=lib.embed(
                 title="List of commands:",
-                footer=f"Use {prefix}help <command> to get more specific usage information."
+                footer=f"Use {self.bot.command_prefix}help <command> to get more specific usage information."
             )
             for category in cogs.keys():
                 embed.add_field(name=category,value="\n".join(cogs[category]))
@@ -74,7 +73,7 @@ class help(commands.Cog):
         if not (embed):   
             embed=lib.embed(
                 title="This command does not exist",
-                description=f"Try {prefix}help to see a list of available commands."
+                description=f"Try {self.bot.command_prefix}help to see a list of available commands."
             )       
         await ctx.send(embed=embed)
 
