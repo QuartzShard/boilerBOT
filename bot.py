@@ -56,7 +56,7 @@ class bot(commands.Bot):
         self.load_extension("boilerBot.corecommands.about")
         ## Log ready
         lib.log('--------------------------------')
-        lib.log('Bot Ready.')
+        lib.log('Bot Logged into the APi and initialised.')
         lib.log(f'Logged in as {self.user.name}')
         lib.log(f'User ID: {self.user.id}')
         lib.log('--------------------------------')
