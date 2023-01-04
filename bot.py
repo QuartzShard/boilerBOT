@@ -3,21 +3,23 @@ import os
 import re
 import json
 import atexit
-import discord
-from discord.ext import commands
+import nextcord
+from nextcord.ext import commands
 from . import lib
 from . import corecommands
 ## Constants and Config
-intents = discord.Intents.default()
+intents = nextcord.Intents.default()
 intents.members = lib.cfg['discord']['intents']['members']
 intents.guilds = lib.cfg['discord']['intents']['guilds']
 intents.reactions = lib.cfg['discord']['intents']['reactions']
+intents.message_content = lib.cfg['discord']['intents']['message_content']
 
 ## Define bot class
 class bot(commands.Bot):
-    def __init__(self, *args, **kwargs):
+    def __init__(self,  *args, defaultGuildVars={}, **kwargs):
+        if not args[0]:
+            args = ("/",)
         super().__init__(*args,**kwargs)
-
         ## Remove default help command to replace with custom one
         self.remove_command('help')
 
@@ -39,13 +41,16 @@ class bot(commands.Bot):
                         self.load_extension(f"{parent}.{name}")
         
         ## Load per-guild variables
-        try:
-            with open("guildVars.json","r") as file:
-                self.guildVars = json.load(file)
-        except FileNotFoundError:
+        if lib.cfg['options']['persist']:
+            try:
+                with open("guildVars.json","r") as file:
+                    self.guildVars = json.load(file)
+            except FileNotFoundError:
+                self.guildVars = {}
+        else:
             self.guildVars = {}
         try:
-            self.guildVarTemplate = kwargs["defaultGuildVars"] 
+            self.guildVarTemplate = defaultGuildVars 
         except KeyError:
             self.guildVarTemplate = {}
 
@@ -54,6 +59,8 @@ class bot(commands.Bot):
         ## Load commands that require login to init
         self.load_extension("boilerBot.corecommands.help")
         self.load_extension("boilerBot.corecommands.about")
+        if lib.cfg['options']['slashcommands']:
+            await self.sync_application_commands()
         ## Log ready
         lib.log('--------------------------------')
         lib.log('Bot Logged into the APi and initialised.')
@@ -80,8 +87,9 @@ class bot(commands.Bot):
 
     ## Store current state of guildVars in a json on shutdown to persist over restarts
     def shutdown(self):
-        with open("guildVars.json","w+") as file:
-            json.dump(self.guildVars,file)
+        if lib.cfg['options']['persist']:
+            with open("guildVars.json","w+") as file:
+                json.dump(self.guildVars,file)
 
 #Testing, will not run when imported
 if __name__ == "__main__":

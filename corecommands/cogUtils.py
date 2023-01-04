@@ -1,12 +1,12 @@
 ## Initialisation
-import discord
-from discord.ext import commands, tasks
+import nextcord
+from nextcord.ext import commands, tasks
 
 ## Cog utility commands
 class cogUtils(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.forbidden = True
+        self.hidden = True
     
     ## Reload a cog
     @commands.command()

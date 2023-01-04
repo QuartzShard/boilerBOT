@@ -1,8 +1,8 @@
 ## Initialisation
 import boilerBot.lib as lib
-import discord
-
-from discord.ext import commands, tasks
+import nextcord
+from typing import Optional
+from nextcord.ext import commands, tasks
 
 ## Define help cog
 class help(commands.Cog):
@@ -15,21 +15,38 @@ class help(commands.Cog):
         {self.bot.command_prefix}help
         {self.bot.command_prefix}help <command>
         """
-        self.forbidden = False
+        self.hidden = False
         
     ## Callable command to provide user help with command usage
-    @commands.command(aliases=["?"])
-    async def help(self, ctx, *args):
+    @commands.command(aliases=["?"],name="help")
+    async def prefhelp(self,ctx,*args):
+        if not args:
+            args = [None]
+        return await self.help(ctx,args[0])
+
+    @nextcord.slash_command(name="help")
+    async def slashhelp(self,ctx,command:Optional[str]):
+        """Get help on how to use this bot.
+
+        Parameters
+         ----------
+        ctx: Interaction
+            The interaction object
+        command: str
+            Optional: Specify a command for more detailled usage info
+        """
+        return await self.help(ctx,command)
+
+    async def help(self, ctx, arg):
         embed=False
-        prefix = self.bot.command_prefix
         ## Provide specific help, or general command list
-        if (args) :
-            cog = self.bot.get_cog(args[0])
-            command = self.bot.get_command(args[0])
+        if (arg) :
+            cog = self.bot.get_cog(arg)
+            command = self.bot.get_command(arg)
             if not (cog):
                 pass
             ## Gather usage info about command
-            elif (not cog.forbidden):
+            elif (not cog.hidden):
                 embed=lib.embed(
                     title=cog.qualified_name,
                     description=cog.description,
@@ -41,7 +58,7 @@ class help(commands.Cog):
             cogs = {}
             for cog in self.bot.cogs:
                 cog = self.bot.get_cog(cog)
-                if (not cog.forbidden):
+                if (not cog.hidden):
                     if not (cog.category in cogs.keys()):
                         cogs[cog.category] = []
                     cogs[cog.category].append(f"`{cog.qualified_name}`\n> {cog.description}")

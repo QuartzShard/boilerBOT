@@ -1,8 +1,8 @@
 ## Initialisation
 import boilerBot.lib as lib
-import discord
+import nextcord
 
-from discord.ext import commands, tasks
+from nextcord.ext import commands, tasks
 
 ## Define about cog
 class about(commands.Cog):
@@ -14,11 +14,25 @@ class about(commands.Cog):
         self.usage = f"""
         {self.bot.command_prefix}about
         """
-        self.forbidden = False
+        self.hidden = False
         
     ## Callable command to provide info about bot
-    @commands.command()
-    async def about(self, ctx, *command):
+    @commands.command(name="about")
+    async def prefabout(self,ctx):
+        return await self.about(ctx)
+
+    @nextcord.slash_command(name="about")
+    async def slashabout(self,ctx):
+        """See information about this bot.
+
+        Parameters
+         ----------
+        ctx: Interaction
+            The interaction object
+        """
+        return await self.about(ctx)
+
+    async def about(self, ctx):
         embed=lib.embed(
             title=lib.cfg['about']['title'],
             description=lib.cfg['about']['desc'],

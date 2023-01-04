@@ -69,9 +69,9 @@ Structure the files like so:
 ```python
 ## Initialisation
 import boilerBot.lib as lib
-import discord
+import nextcord
 
-from discord.ext import commands, tasks
+from nextcord.ext import commands, tasks
 
 ## Define command cog
 class COMMAND_NAME(commands.Cog):
@@ -83,7 +83,7 @@ class COMMAND_NAME(commands.Cog):
         self.usage = f"""
         {self.bot.command_prefix}COMMAND NAME + USAGE INSTRUCTIONS
         """
-        self.forbidden = False
+        self.hidden = False
         
     @commands.command()
     async def COMMAND_NAME(self, ctx, *command):
@@ -96,9 +96,9 @@ As an example, here is the built-in about command:
 ```python
 ## Initialisation
 import boilerBot.lib as lib
-import discord
+import nextcord
 
-from discord.ext import commands, tasks
+from nextcord.ext import commands, tasks
 
 ## Define about cog
 class about(commands.Cog):
@@ -110,7 +110,7 @@ class about(commands.Cog):
         self.usage = f"""
         {self.bot.command_prefix}about
         """
-        self.forbidden = False
+        self.hidden = False
         
     ## Callable command to provide info about bot
     @commands.command()

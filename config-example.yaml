@@ -6,6 +6,7 @@ discord:
   token: "TOKEN"      
   #Manage requested intents                  
   intents:        
+    message_content: True #Turn this off if you don't use prefix commands and the bot doesn't need to see message content   
     members: False #Change to true if the bot needs to know about users
     guilds: True #Leave this as true unless you know you don't need it
     reactions : False #Change this to true if your bot needs to interact with message reactions
@@ -22,6 +23,10 @@ about:
 options:
   #Bot Command Prefix 
   prefix: "!" 
+  #Should core commands be registered as slash commands?
+  slashcommands: True
+  #Store data in a json over restarts?
+  persist: False
   #Message embed settings
   embed:
     #Delete last message when new one sent?
