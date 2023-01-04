@@ -1,3 +1,5 @@
-config.yaml
+config.toml
 .vscode
-**__pycache__**
+# Added by cargo
+
+/target
