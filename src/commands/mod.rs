@@ -1,45 +1,83 @@
+#![allow(dead_code)]
 use serenity::builder::CreateApplicationCommand;
-use serenity::model::prelude::command::Command;
+use serenity::json::Value;
+use serenity::model::prelude::command::{Command};
 use serenity::model::{id::GuildId, prelude::interaction::application_command::CommandDataOption};
 use serenity::prelude::{Context, TypeMapKey};
 use std::collections::HashMap;
+use std::error::Error;
 use std::fmt;
 use std::result::Result;
 
-use tracing::{event, info, Level};
 
+use tracing::{event, info, Level};
 // Error handling for commands
-pub type CommandResult = Result<CommandResponse<String>, CommandError>;
+pub type CommandResult = Result<CommandResponse, CommandError>;
+#[derive(Debug)]
 pub enum CommandError {
-    FailedToSend,
-    FailedToExecute,
+    FailedToSend(String),
+    FailedToExecute(String),
+    ArgumentError(String),
 }
+impl Error for CommandError {
+    fn description(&self) -> &str {
+        match &*self {
+            Self::FailedToSend(s) => &s,
+            Self::FailedToExecute(s) => &s,
+            Self::ArgumentError(s) => &s,
+        }
+    }
+}
+
 impl fmt::Display for CommandError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let formatted = match self {
-            CommandError::FailedToSend => "Failed to send",
-            CommandError::FailedToExecute => "Failed to execute",
+            CommandError::FailedToSend(s) => s,
+            CommandError::FailedToExecute(s) => s,
+            CommandError::ArgumentError(s) => s,
         };
         write!(f, "{}", formatted)
     }
 }
-pub enum CommandResponse<String> {
+
+pub enum CommandResponse {
     StringResponse(String),
 }
 
 // Command must implement RegisterableAsSlashCommand
 pub trait RegisterableAsSlashCommand {
-    fn new() -> Self
-    where
-        Self: Sized;
     fn name(&self) -> String;
     fn about(&self) -> String;
+    fn options<'a>(
+        &'a self,
+        command: &'a mut CreateApplicationCommand,
+    ) -> &mut CreateApplicationCommand {
+        command
+    }
     fn run(&self, options: &[CommandDataOption]) -> CommandResult;
     fn register<'a>(
         &self,
         command: &'a mut CreateApplicationCommand,
     ) -> &'a mut CreateApplicationCommand {
-        command.name(self.name()).description(self.about())
+        command.name(self.name()).description(self.about());
+        self.options(command);
+        command
+    }
+    fn map_opts(
+        &self,
+        options: &[CommandDataOption],
+    ) -> Result<HashMap<String, Value>, CommandError> {
+        let mut args: HashMap<String, Value> = HashMap::new();
+        for option in options {
+            args.insert(
+                option.name.clone(),
+                option
+                    .value
+                    .to_owned()
+                    .ok_or(CommandError::ArgumentError("Value not found".to_string()))?,
+            );
+        }
+        Ok(args)
     }
 }
 
@@ -49,19 +87,20 @@ impl TypeMapKey for CommandList {
 }
 pub type CommandBox = Box<dyn RegisterableAsSlashCommand + Sync + Send>;
 
+// Macros for command registration
 macro_rules! register {
     (($struct: expr, $commands: expr, $command_map: expr)) => {
         $commands.create_application_command(|command| {
-            let name = $struct.new();
+            let name = $struct;
             name.register(command);
             info!("Registered command {}.", name.name());
             $command_map.insert(name.name(), Box::new(name) as CommandBox);
             command
         })
     };
-    (($struct: expr, $commands: expr, $command_map: expr), $($structs: expr, $commandss: expr, $command_maps: expr),+) => {
-        register!($struct, $commands, $command_map);
-        register!(structs, $commandss, $command_maps),+
+    ( ($struct: expr, $commands: expr, $command_map: expr), $( ($structs: expr, $commandss: expr, $command_maps: expr) ),+ ) => {
+        register!(($struct, $commands, $command_map));
+        register!($(($structs, $commandss, $command_maps)),+)
     };
 }
 // This is where you should register your commands with the bot.
@@ -69,6 +108,7 @@ macro_rules! register {
 // Then, inside of either of the |commands| {} blocks, you can use the register! macro to register
 // the command
 mod ping;
+mod test_command;
 pub async fn register_commands(ctx: &Context) {
     event!(Level::DEBUG, "Registering commands");
     let mut data = ctx.data.write().await;
@@ -85,7 +125,10 @@ pub async fn register_commands(ctx: &Context) {
         let guild_id = GuildId(test_guild_id);
         let _guild_commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
             //register!((name::StructName, commands, command_map))
-            register!((ping::PingCommand, commands, command_map));
+            register!(
+                (ping::PingCommand, commands, command_map),
+                (test_command::TestCommand, commands, command_map)
+            );
             commands
         })
         .await;

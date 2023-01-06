@@ -11,7 +11,7 @@ use std::collections::HashMap;
 
 use tracing::{event, Level};
 
-use commands::{CommandError, CommandResponse, CommandResult};
+use commands::{CommandResponse};
 use config::Config;
 
 struct Handler;

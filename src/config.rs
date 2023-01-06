@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs};
+use std::{fs};
 
 use serde_derive::{Deserialize, Serialize};
 use serenity::prelude::TypeMapKey;
