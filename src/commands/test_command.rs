@@ -18,13 +18,15 @@ impl RegisterableAsSlashCommand for TestCommand {
         command
             .create_option(|option| {
                 option
-                    .name("Other")
+                    .name("other")
+                    .description("otherarg")
                     .kind(CommandOptionType::String)
                     .required(true)
             })
             .create_option(|option| {
                 option
-                    .name("Val")
+                    .name("val")
+                    .description("test")
                     .kind(CommandOptionType::String)
                     .required(true)
             })
