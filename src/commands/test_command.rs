@@ -18,32 +18,57 @@ impl RegisterableAsSlashCommand for TestCommand {
         command
             .create_option(|option| {
                 option
-                    .name("other")
-                    .description("otherarg")
+                    .name("stringarg")
+                    .description("String")
                     .kind(CommandOptionType::String)
                     .required(true)
             })
             .create_option(|option| {
                 option
-                    .name("val")
-                    .description("test")
-                    .kind(CommandOptionType::String)
+                    .name("userarg")
+                    .description("User")
+                    .kind(CommandOptionType::User)
+                    .required(true)
+            })
+            .create_option(|option| {
+                option
+                    .name("rolearg")
+                    .description("Role")
+                    .kind(CommandOptionType::Role)
+                    .required(true)
+            })
+            .create_option(|option| {
+                option
+                    .name("intarg")
+                    .description("Integer")
+                    .kind(CommandOptionType::Integer)
+                    .required(true)
+            })
+            .create_option(|option| {
+                option
+                    .name("boolarg")
+                    .description("Bool")
+                    .kind(CommandOptionType::Boolean)
+                    .required(true)
+            })
+            .create_option(|option| {
+                option
+                    .name("mentionablearg")
+                    .description("tag")
+                    .kind(CommandOptionType::Mentionable)
                     .required(true)
             })
     }
     fn run(&self, options: &[CommandDataOption]) -> CommandResult {
-        info!("{:?}", options);
-        let args = self.map_opts(options)?;
-        let name = args
-            .get("val")
-            .ok_or(CommandError::ArgumentError(String::from(
-                "Missing argument",
-            )))?
-            .as_str()
-            .ok_or(CommandError::ArgumentError(String::from(
-                "Missing argument",
-            )))?
-            .to_string();
+        let mut args: HashMap<String, &CommandDataOptionValue> = HashMap::new();
+        let args = self.map_opts(options, &mut args)?;
+        let name = match args
+            .get("mentionablearg")
+            .ok_or(CommandError::ArgumentError("no arg?".to_string()))?
+        {
+            CommandDataOptionValue::Role(r) => r.name.clone(),
+            _ => "No role".to_string(),
+        };
         let mut response = CreateInteractionResponse::default();
         response
             .kind(InteractionResponseType::ChannelMessageWithSource)

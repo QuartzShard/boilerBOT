@@ -2,6 +2,7 @@
 use serenity::builder::{CreateApplicationCommand, CreateInteractionResponse};
 use serenity::json::Value;
 use serenity::model::prelude::command::Command;
+use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
 use serenity::model::{id::GuildId, prelude::interaction::application_command::CommandDataOption};
 use serenity::prelude::{Context, TypeMapKey};
 use std::collections::HashMap;
@@ -58,17 +59,17 @@ pub trait RegisterableAsSlashCommand {
         self.options(command);
         command
     }
-    fn map_opts(
-        &self,
-        options: &[CommandDataOption],
-    ) -> Result<HashMap<String, Value>, CommandError> {
-        let mut args: HashMap<String, Value> = HashMap::new();
+    fn map_opts<'a>(
+        &'a self,
+        options: &'a [CommandDataOption],
+        args: &'a mut HashMap<String, &'a CommandDataOptionValue>,
+    ) -> Result<&'a mut HashMap<String, &'a CommandDataOptionValue>, CommandError> {
         for option in options {
             args.insert(
                 option.name.clone(),
                 option
-                    .value
-                    .to_owned()
+                    .resolved
+                    .as_ref()
                     .ok_or(CommandError::ArgumentError("Value not found".to_string()))?,
             );
         }
