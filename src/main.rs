@@ -6,12 +6,12 @@ use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::StandardFramework;
 use serenity::model::application::interaction::{Interaction, InteractionResponseType};
 use serenity::model::gateway::Ready;
+use serenity::model::id::GuildId;
 use serenity::prelude::*;
 use std::collections::HashMap;
 
-use tracing::{event, Level};
+use tracing::{event, info, Level};
 
-use commands::{CommandResponse};
 use config::Config;
 
 struct Handler;
@@ -29,7 +29,7 @@ impl EventHandler for Handler {
                         Level::ERROR,
                         "Command {} not found in hashmap, called in {}",
                         &command.data.name,
-                        &command.guild_id.unwrap().0
+                        &command.guild_id.unwrap_or(GuildId::default()).0
                     );
                 }
             };
@@ -39,16 +39,18 @@ impl EventHandler for Handler {
                 &command_func.name()
             );
             let command_response = match command_func.run(&command.data.options) {
-                Ok(response) => match response {
-                    CommandResponse::StringResponse(s) => s,
-                },
-                Err(why) => why.to_string(),
+                Ok(response) => response,
+                Err(why) => {
+                    let mut res = serenity::builder::CreateInteractionResponse::default();
+                    res.kind(InteractionResponseType::ChannelMessageWithSource)
+                        .interaction_response_data(|res| res.content(why.to_string()));
+                    res
+                }
             };
             match command
-                .create_interaction_response(&ctx.http, |response| {
-                    response
-                        .kind(InteractionResponseType::ChannelMessageWithSource)
-                        .interaction_response_data(|msg| msg.content(command_response))
+                .create_interaction_response(&ctx.http, |res| {
+                    *res = command_response;
+                    res
                 })
                 .await
             {
@@ -97,5 +99,5 @@ async fn main() {
     });
 
     tokio::signal::ctrl_c().await.expect("Shutdown Error");
-    println!("Recieved Interrupt, stopping");
+    info!("Recieved Interrupt, stopping");
 }

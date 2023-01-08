@@ -1,7 +1,7 @@
 #![allow(dead_code)]
-use serenity::builder::CreateApplicationCommand;
+use serenity::builder::{CreateApplicationCommand, CreateInteractionResponse};
 use serenity::json::Value;
-use serenity::model::prelude::command::{Command};
+use serenity::model::prelude::command::Command;
 use serenity::model::{id::GuildId, prelude::interaction::application_command::CommandDataOption};
 use serenity::prelude::{Context, TypeMapKey};
 use std::collections::HashMap;
@@ -9,10 +9,9 @@ use std::error::Error;
 use std::fmt;
 use std::result::Result;
 
-
 use tracing::{event, info, Level};
 // Error handling for commands
-pub type CommandResult = Result<CommandResponse, CommandError>;
+pub type CommandResult<'a> = Result<CreateInteractionResponse<'a>, CommandError>;
 #[derive(Debug)]
 pub enum CommandError {
     FailedToSend(String),
@@ -38,10 +37,6 @@ impl fmt::Display for CommandError {
         };
         write!(f, "{}", formatted)
     }
-}
-
-pub enum CommandResponse {
-    StringResponse(String),
 }
 
 // Command must implement RegisterableAsSlashCommand
